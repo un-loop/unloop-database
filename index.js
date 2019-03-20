@@ -2,7 +2,7 @@ const database = require('./src/database');
 
 module.exports = (db, docClient) => {
 
-    const instance = database(db, docClient);
+    const instance = new database(db, docClient);
 
     return function(table) {
         this.getAll = instance.safeOp(table, instance.getAll);
