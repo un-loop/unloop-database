@@ -1,7 +1,7 @@
 const BatchRequestBuilder = require("unloop-batch-request")
 
 module.exports = function(db, docClient) {
-    const tableExists = () => {
+    const tableExists = function() {
         let param = {
             TableName: this.schema.TableName
         };
@@ -15,7 +15,7 @@ module.exports = function(db, docClient) {
         ));
     }
 
-    const createTable = async () => {
+    const createTable = async function() {
         return Promise.resolve().then( () =>
             new Promise((resolve, reject ) => {
                 db.createTable(this.schema, (err, data) =>
@@ -24,7 +24,7 @@ module.exports = function(db, docClient) {
             }));
     }
 
-    const initTable = async () => {
+    const initTable = async function() {
         return Promise.resolve().then( () =>
             new Promise((resolve, reject ) => {
                 if (!this.initialData) resolve();
@@ -42,7 +42,7 @@ module.exports = function(db, docClient) {
             }));
     }
 
-    const ensureTable = async () => {
+    const ensureTable = async function() {
         const first = tableExists.bind(this);
         const second = createTable.bind(this);
         const init = initTable.bind(this);
@@ -53,7 +53,7 @@ module.exports = function(db, docClient) {
         });
     }
 
-    const getUpdateProperties = (entity) => {
+    const getUpdateProperties = function(entity) {
         let map = {};
 
         let count = 0;
@@ -71,7 +71,7 @@ module.exports = function(db, docClient) {
         return map;
     }
 
-    const getUpdateExpression = (map) => {
+    const getUpdateExpression = function(map) {
         let assignment = [];
 
         for (let prop in map) {
@@ -85,7 +85,7 @@ module.exports = function(db, docClient) {
         return "set " + assignment.join(", ");
     }
 
-    const getUpdateItemInput = (entity, partitionKey, sortKey) => {
+    const getUpdateItemInput = function(entity, partitionKey, sortKey) {
         let key = {
             [this.key]: partitionKey
         };
@@ -115,7 +115,7 @@ module.exports = function(db, docClient) {
         return result;
     }
 
-    this.getAll = async () => {
+    this.getAll = async function() {
         let params = {
             TableName: this.schema.TableName
         };
@@ -137,7 +137,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.get = async (partitionKey, sortKey = undefined) => {
+    this.get = async function(partitionKey, sortKey = undefined) {
         let key = {
             [this.key]: partitionKey
         };
@@ -168,7 +168,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.create = async (entity) => {
+    this.create = async function(entity) {
 
         let projection = {};
         for(let prop in entity) if (entity[prop]) projection[prop] = entity[prop];
@@ -186,7 +186,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.batchWrite = async (requests) => {
+    this.batchWrite = async function(requests) {
         let params = {
             RequestItems: requests.RenderRequest()
         }
@@ -199,11 +199,11 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.update = async (
+    this.update = async function(
         entity,
         partitionKey,
         sortKey = undefined
-    ) => {
+    ) {
         let key = {
             [this.key]: partitionKey
         };
@@ -230,7 +230,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.remove = async (partitionKey, sortKey = undefined) => {
+    this.remove = async function(partitionKey, sortKey = undefined) {
         let key = {
             [this.key]: partitionKey
         };
@@ -253,7 +253,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    const dbQuery = async (query) => {
+    const dbQuery = async function(query) {
         let params = {
             TableName: this.schema.TableName,
             KeyConditionExpression: "#key = :value",
@@ -286,7 +286,7 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    const inMemoryQuery = async (query) => {
+    const inMemoryQuery = async function(query) {
         let params = {
             TableName: this.schema.TableName
         };
@@ -321,11 +321,11 @@ module.exports = function(db, docClient) {
         return promise;
     }
 
-    this.query = async (query) => {
+    this.query = async function(query) {
         return await query.partitionKey ? dbQuery.call(this, query) : inMemoryQuery.call(this, query);
     }
 
-    this.safeOp = (table, asyncCallback) => {
+    this.safeOp = function(table, asyncCallback) {
         return async function() {
             await ensureTable.call(table);
             return await asyncCallback.apply(table, arguments);
