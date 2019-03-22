@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/un-loop/unloop-database#readme",
   "dependencies": {
-    "unloop-batch-request": "^1.0.4"
+    "unloop-batch-request": "^1.0.5"
   }
 }
