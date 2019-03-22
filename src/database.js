@@ -25,12 +25,13 @@ module.exports = function(db, docClient) {
     }
 
     const initTable = async function() {
-        return Promise.resolve().then( () =>
+        return Promise.resolve(this.initialData.call ? this.initialData() : this.initialData)
+        .then( (result) =>
             new Promise((resolve, reject ) => {
-                if (!this.initialData) resolve();
+                if (!result) resolve();
 
                 const builder = new BatchRequestBuilder();
-                builder.AddItems(this.schema.TableName, this.initialData, "add");
+                builder.AddItems(this.schema.TableName, result, "add");
 
                 const param = {
                     RequestItems: builder.RenderRequest()
