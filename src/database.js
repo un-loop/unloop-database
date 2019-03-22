@@ -36,7 +36,7 @@ module.exports = function(db, docClient) {
                     RequestItems: builder.RenderRequest()
                 }
 
-                db.batchWrite(param, (err, data) =>
+                docClient.batchWrite(param, (err, data) =>
                     err ? reject(err) : resolve(data)
                 );
             }));
