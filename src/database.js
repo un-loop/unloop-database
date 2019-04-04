@@ -203,10 +203,10 @@ module.exports = function(db, docClient) {
     this.update = async function(
         entity,
         partitionKey,
-        sortKey = undefined
+        sortKey
     ) {
         let key = {
-            [this.key]: partitionKey
+            [this.key]: partitionKey ? partitionKey : entity[this.key]
         };
 
         if (sortKey) {
