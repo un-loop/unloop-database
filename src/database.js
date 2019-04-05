@@ -74,16 +74,26 @@ module.exports = function(db, docClient) {
 
     const getUpdateExpression = function(map) {
         let assignment = [];
+        let remove = [];
 
         for (let prop in map) {
-            assignment.push(map[prop].param + " = " + map[prop].valueParam);
+            if (map[prop].value !== undefined) {
+                assignment.push(map[prop].param + " = " + map[prop].valueParam);
+            } else {
+                remove.push(map[prop].param);
+            }
         }
 
-        if (!assignment.length) {
-            return "";
+        let operations = [];
+        if (assignment.length) {
+            operations.push("set " + assignment.join(", "));
         }
 
-        return "set " + assignment.join(", ");
+        if (remove.length) {
+            operations.push("remove " + remove.join(", "));
+        }
+
+        return operations.length ? operations.join(require('os').EOL) : "";
     }
 
     const getUpdateItemInput = function(entity, partitionKey, sortKey) {
