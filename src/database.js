@@ -98,7 +98,7 @@ module.exports = function(db, docClient) {
 
     const getUpdateItemInput = function(entity, partitionKey, sortKey) {
         let key = {
-            [this.key]: partitionKey
+            [this.key]: partitionKey ? partitionKey : entity[this.key]
         };
 
         if (sortKey) {
@@ -111,7 +111,7 @@ module.exports = function(db, docClient) {
         };
 
         let map = getUpdateProperties.call(this, entity);
-        result.UpdateExpression = getUpdateExpression.call(this,map);
+        result.UpdateExpression = getUpdateExpression.call(this, map);
         if (!result.UpdateExpression) return undefined;
 
         result.ExpressionAttributeValues = {};
@@ -215,14 +215,6 @@ module.exports = function(db, docClient) {
         partitionKey,
         sortKey
     ) {
-        let key = {
-            [this.key]: partitionKey ? partitionKey : entity[this.key]
-        };
-
-        if (sortKey) {
-            key[this.rangeKey] = sortKey;
-        }
-
         let params = getUpdateItemInput.call(this,
             entity,
             partitionKey,
@@ -231,12 +223,11 @@ module.exports = function(db, docClient) {
 
         let promise = params ?
             new Promise((resolve, reject) => {
-
-            docClient.update(
-                params,
-                (err) => err ? reject(err) : resolve(entity)
-            );
-        }) : Promise.resolve(undefined);
+                docClient.update(
+                    params,
+                    (err) => err ? reject(err) : resolve(entity)
+                );
+            }) : Promise.resolve(undefined);
 
         return promise;
     }
