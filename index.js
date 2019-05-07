@@ -11,7 +11,9 @@ module.exports = (db, docClient) => {
         const noSanitizeChain = (command) => safeOp(command)(table);
 
         this.getAll = sanitizeOutputChain(instance.getAll);
+        this.unsafeGetAll = noSanitizeChain(instance.getAll);
         this.get = sanitizeOutputChain(instance.get);
+        this.unsafeGet = noSanitizeChain(instance.get);
         this.create = sanitizeOutputChain(instance.create);
         this.update = sanitizeBothChain(instance.update);
         this.delete = noSanitizeChain(instance.remove);
