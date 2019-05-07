@@ -335,7 +335,7 @@ module.exports = function(db, docClient) {
     this.safeOp = (asyncTableCallback) => (table) => {
         return async function() {
             await ensureTable.call(table);
-            return await asyncTableCallback(table)(arguments);
+            return await asyncTableCallback(table)(...arguments);
         }
     }
 
@@ -346,13 +346,13 @@ module.exports = function(db, docClient) {
                 arguments[0] = table.sanitize(arguments[0]);
             }
 
-            return await asyncTableCallback(table)(arguments);
+            return await asyncTableCallback(table)(...arguments);
         }
     }
 
     this.sanitizeOutput = (asyncTableCallback) => (table) => {
         return async function() {
-            let result = await asyncTableCallback(table)(arguments);
+            let result = await asyncTableCallback(table)(...arguments);
 
             if (!table.sanitize || typeof table.sanitize !== "function") {
                 return result;
