@@ -2,15 +2,20 @@ const database = require('./src/database');
 
 module.exports = (db, docClient) => {
 
-    const instance = new database(db, docClient);
+    const instance = new database(db, docClient);    
 
     return function(table) {
-        this.getAll = instance.safeOp(table, instance.getAll);
-        this.get = instance.safeOp(table, instance.get);
-        this.create = instance.safeOp(table, instance.create);
-        this.update = instance.safeOp(table, instance.update);
-        this.delete = instance.safeOp(table, instance.remove);
-        this.query = instance.safeOp(table, instance.query);
+        const safeOp = (command) => instance.safeOp(instance.command(command));
+        const sanitizeOutputChain = (command) => instance.sanitizeOutput(safeOp(command))(table);
+        const sanitizeBothChain =  (command) => instance.sanitizeOutput(instance.sanitizeInput(safeOp(command)))(table);
+        const noSanitizeChain = (command) => safeOp(command)(table);
+
+        this.getAll = sanitizeOutputChain(instance.getAll);
+        this.get = sanitizeOutputChain(instance.get);
+        this.create = sanitizeOutputChain(instance.create);
+        this.update = sanitizeBothChain(instance.update);
+        this.delete = noSanitizeChain(instance.remove);
+        this.query = sanitizeOutputChain(instance.query);
         this.batch = instance.batchWrite;
     }
 }

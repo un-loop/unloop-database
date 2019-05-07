@@ -327,11 +327,42 @@ module.exports = function(db, docClient) {
         return await query.partitionKey ? dbQuery.call(this, query) : inMemoryQuery.call(this, query);
     }
 
-    this.safeOp = function(table, asyncCallback) {
+    this.command = (asyncCallback) => (table) =>
+    {
+        return asyncCallback.bind(table);
+    }
+
+    this.safeOp = (asyncTableCallback) => (table) => {
         return async function() {
             await ensureTable.call(table);
-            return await asyncCallback.apply(table, arguments);
+            return await asyncTableCallback(table)(arguments);
         }
     }
 
+    this.sanitizeInput = (asyncTableCallback) => (table) =>
+    {
+        return async function() {
+            if (table.sanitize && typeof table.sanitize === "function" && arguments[0]) {
+                arguments[0] = table.sanitize(arguments[0]);
+            }
+
+            return await asyncTableCallback(table)(arguments);
+        }
+    }
+
+    this.sanitizeOutput = (asyncTableCallback) => (table) => {
+        return async function() {
+            let result = await asyncTableCallback(table)(arguments);
+
+            if (!table.sanitize || typeof table.sanitize !== "function") {
+                return result;
+            }
+
+            if (Array.isArray(result)) {
+                return result.map(i => table.sanitize(i));
+            }
+
+            return table.sanitize(result);
+        }
+    }
 }
