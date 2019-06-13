@@ -270,6 +270,7 @@ module.exports = function(db, docClient) {
         if (query.isOrdered !== undefined)
             params["ScanIndexForward"] = query.isOrdered;
         if (query.max) params["Limit"] = query.max;
+        if (query.index) params["IndexName"] = query.index;
 
         let promise = new Promise((resolve, reject) => {
             docClient.query(params, (err, data) => {
@@ -292,6 +293,7 @@ module.exports = function(db, docClient) {
         let params = {
             TableName: this.schema.TableName
         };
+        if (query.index) params["IndexName"] = query.index;
 
         let promise = new Promise((resolve, reject) => {
             docClient.scan(params, (err, data) => {
