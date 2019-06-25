@@ -260,7 +260,7 @@ module.exports = function(db, docClient) {
             TableName: this.schema.TableName,
             KeyConditionExpression: "#key = :value",
             ExpressionAttributeNames: {
-                "#key": this.key
+                "#key": query.index ? this.indexKey[query.index] : this.key
             },
             ExpressionAttributeValues: {
                 ":value": query.partitionKey
@@ -361,10 +361,10 @@ module.exports = function(db, docClient) {
             }
 
             if (Array.isArray(result)) {
-                return result.map(i => table.sanitize(i));
+                return result.map(i => i ? table.sanitize(i) : i);
             }
 
-            return table.sanitize(result);
+            return result ? table.sanitize(result) : result;
         }
     }
 }

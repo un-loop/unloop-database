@@ -1,6 +1,6 @@
 {
   "name": "unloop-database-dynamo",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "dynamo database wrapper used by unloop. Provides basic table operations (get, getAll, create, update, delete, query, batch). Query functionality is dependent on unloop-query, Batch is dependent on unloop-database-wrap",
   "main": "index.js",
   "scripts": {

@@ -19,6 +19,7 @@ module.exports = (db, docClient) => {
         this.unsafeUpdate = noSanitizeChain(instance.update);
         this.delete = noSanitizeChain(instance.remove);
         this.query = sanitizeOutputChain(instance.query);
+        this.unsafeQuery = noSanitizeChain(instance.query);
         this.batch = instance.batchWrite;
     }
 }
